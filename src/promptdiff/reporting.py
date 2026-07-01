@@ -1,4 +1,5 @@
 """Reporting — console (rich), JUnit XML, and JSON views of a run."""
+
 from __future__ import annotations
 
 from xml.sax.saxutils import escape
@@ -36,10 +37,12 @@ def render_console(run: RunResult, console: Console | None = None) -> None:
                 console.print(f"\n[bold]{c.case_name}[/bold] · {a.type} diff:")
                 console.print(a.detail["diff"])
 
-    summary = (f"[green]{counts['passed']} passed[/green], "
-               f"[red]{counts['failed']} failed[/red], "
-               f"[yellow]{counts['errors']} errors[/yellow] "
-               f"({counts['total']} total)")
+    summary = (
+        f"[green]{counts['passed']} passed[/green], "
+        f"[red]{counts['failed']} failed[/red], "
+        f"[yellow]{counts['errors']} errors[/yellow] "
+        f"({counts['total']} total)"
+    )
     console.print(summary)
 
 
@@ -61,8 +64,9 @@ def to_junit_xml(run: RunResult) -> str:
         f'failures="{counts["failed"]}" errors="{counts["errors"]}">'
     )
     for c in run.case_results:
-        lines.append(f'  <testcase name="{escape(c.case_name)}" '
-                     f'time="{(c.duration_ms or 0) / 1000:.4f}">')
+        lines.append(
+            f'  <testcase name="{escape(c.case_name)}" time="{(c.duration_ms or 0) / 1000:.4f}">'
+        )
         if c.error:
             lines.append(f'    <error message="{escape(c.error)}"/>')
         elif not c.passed:

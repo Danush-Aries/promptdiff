@@ -3,6 +3,7 @@
 ``not_contains`` is registered as a convenience alias that flips ``negate`` on the
 ``contains`` implementation, matching the PLAN (not_contains == contains + negate).
 """
+
 from __future__ import annotations
 
 from dataclasses import replace

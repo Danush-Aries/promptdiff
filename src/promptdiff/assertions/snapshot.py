@@ -4,6 +4,7 @@ First run with no stored snapshot records the output and passes (marked "new").
 Subsequent runs compare byte-for-byte and fail with a unified diff on drift.
 ``update=True`` (from ``--update-snapshots``) rewrites the snapshot and passes.
 """
+
 from __future__ import annotations
 
 import difflib
@@ -20,8 +21,13 @@ if TYPE_CHECKING:
 class SnapshotAssertion(Assertion):
     type_name = "snapshot"
 
-    def __init__(self, snapshot_id: str | None = None, update: bool = False,
-                 negate: bool = False, description: str | None = None) -> None:
+    def __init__(
+        self,
+        snapshot_id: str | None = None,
+        update: bool = False,
+        negate: bool = False,
+        description: str | None = None,
+    ) -> None:
         super().__init__(negate=negate, description=description)
         self.snapshot_id = snapshot_id
         self.update = update

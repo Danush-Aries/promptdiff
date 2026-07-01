@@ -1,4 +1,5 @@
 """`contains` / `not_contains` — substring membership assertions."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -13,9 +14,14 @@ if TYPE_CHECKING:
 class ContainsAssertion(Assertion):
     type_name = "contains"
 
-    def __init__(self, values: list[str], case_sensitive: bool = True,
-                 mode: str = "all", negate: bool = False,
-                 description: str | None = None) -> None:
+    def __init__(
+        self,
+        values: list[str],
+        case_sensitive: bool = True,
+        mode: str = "all",
+        negate: bool = False,
+        description: str | None = None,
+    ) -> None:
         super().__init__(negate=negate, description=description)
         if not values:
             raise AssertionConfigError("contains: 'value' is required")

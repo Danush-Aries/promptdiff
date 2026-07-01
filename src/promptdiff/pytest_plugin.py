@@ -7,6 +7,7 @@ xdist, and CI reporters all work with zero network.
 
 Also exposes a ``@case`` decorator for defining cases inline in Python test files.
 """
+
 from __future__ import annotations
 
 import os
@@ -25,9 +26,15 @@ _SUFFIXES = (".promptdiff.yaml", ".promptdiff.yml")
 
 def pytest_addoption(parser: Any) -> None:
     group = parser.getgroup("promptdiff")
-    group.addoption("--promptdiff-update-snapshots", action="store_true", default=False,
-                    help="rewrite promptdiff snapshots instead of failing on drift")
-    parser.addini("promptdiff_cassette_dir", "cassette dir for promptdiff", default="tests/cassettes")
+    group.addoption(
+        "--promptdiff-update-snapshots",
+        action="store_true",
+        default=False,
+        help="rewrite promptdiff snapshots instead of failing on drift",
+    )
+    parser.addini(
+        "promptdiff_cassette_dir", "cassette dir for promptdiff", default="tests/cassettes"
+    )
 
 
 class PromptAssertionError(AssertionError):
@@ -52,8 +59,12 @@ class PromptFile(pytest.File):
         update = self.config.getoption("--promptdiff-update-snapshots")
         for case in suite.cases:
             yield PromptItem.from_parent(
-                self, name=case.name, case=case, suite=suite,
-                cassette=cassette, update_snapshots=update,
+                self,
+                name=case.name,
+                case=case,
+                suite=suite,
+                cassette=cassette,
+                update_snapshots=update,
             )
 
 
@@ -67,12 +78,15 @@ class PromptItem(pytest.Item):
 
     def runtest(self) -> None:
         # Strictly hermetic in pytest: force replay, no recording.
-        provider, eff = _resolve_provider(
-            self.suite, "replay", "none", self.cassette, offline=True
-        )
+        provider, eff = _resolve_provider(self.suite, "replay", "none", self.cassette, offline=True)
         snapshot_dir = os.path.join(os.path.dirname(str(self.path)) or ".", "__snapshots__")
-        result = run_case(self.case, provider, eff, snapshot_dir=snapshot_dir,
-                          update_snapshots=self.update_snapshots)
+        result = run_case(
+            self.case,
+            provider,
+            eff,
+            snapshot_dir=snapshot_dir,
+            update_snapshots=self.update_snapshots,
+        )
         if not result.passed:
             if result.error:
                 raise PromptAssertionError(result.error)
@@ -109,12 +123,19 @@ def case(name: str, provider: str = "replay", model: str = "", **kwargs):
         if isinstance(a, AssertionSpec):
             specs.append(a)
         else:
-            specs.append(AssertionSpec(type=a["type"],
-                                       config={k: v for k, v in a.items() if k != "type"}))
-    the_case = Case(name=name, provider=provider, model=model,
-                    prompt=kwargs.get("prompt"), template=kwargs.get("template"),
-                    vars=kwargs.get("vars", {}), params=kwargs.get("params", {}),
-                    assertions=specs)
+            specs.append(
+                AssertionSpec(type=a["type"], config={k: v for k, v in a.items() if k != "type"})
+            )
+    the_case = Case(
+        name=name,
+        provider=provider,
+        model=model,
+        prompt=kwargs.get("prompt"),
+        template=kwargs.get("template"),
+        vars=kwargs.get("vars", {}),
+        params=kwargs.get("params", {}),
+        assertions=specs,
+    )
 
     def _decorator(fn):
         _REGISTERED_CASES.append(the_case)

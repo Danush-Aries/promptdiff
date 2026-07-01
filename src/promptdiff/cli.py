@@ -10,10 +10,10 @@
 Exit codes: 0 all pass · 1 assertion failure/regression · 2 config/load error
             · 3 cassette miss in offline mode.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 import typer
 
@@ -69,18 +69,18 @@ def list_cmd(
 @app.command()
 def run(
     paths: list[str] = typer.Argument(..., help="suite YAML files or directories"),
-    provider: Optional[str] = typer.Option(None, "--provider", help="override provider"),
-    record_mode: str = typer.Option("once", "--record-mode",
-                                    help="none|once|new_episodes|all"),
+    provider: str | None = typer.Option(None, "--provider", help="override provider"),
+    record_mode: str = typer.Option("once", "--record-mode", help="none|once|new_episodes|all"),
     cassette_dir: str = typer.Option("tests/cassettes", "--cassette-dir"),
     snapshot_dir: str = typer.Option("__snapshots__", "--snapshot-dir"),
     update_snapshots: bool = typer.Option(False, "--update-snapshots"),
     report: str = typer.Option("console", "--report", help="console|json|junit"),
-    out: Optional[Path] = typer.Option(None, "--out", help="write report to FILE"),
-    k: Optional[str] = typer.Option(None, "-k", help="filter cases by name/tag substring"),
+    out: Path | None = typer.Option(None, "--out", help="write report to FILE"),
+    k: str | None = typer.Option(None, "-k", help="filter cases by name/tag substring"),
     fail_fast: bool = typer.Option(False, "--fail-fast"),
-    offline: bool = typer.Option(True, "--offline/--online",
-                                 help="force ReplayProvider (default: on)"),
+    offline: bool = typer.Option(
+        True, "--offline/--online", help="force ReplayProvider (default: on)"
+    ),
 ) -> None:
     """Run suites and report. Offline by default — zero network, zero cost."""
     suites = _load(paths)
@@ -90,9 +90,15 @@ def run(
 
     for suite in suites:
         run_result = run_suite(
-            suite, provider=provider, record_mode=record_mode,
-            cassette_dir=cassette_dir, offline=offline, snapshot_dir=snapshot_dir,
-            update_snapshots=update_snapshots, name_filter=k, fail_fast=fail_fast,
+            suite,
+            provider=provider,
+            record_mode=record_mode,
+            cassette_dir=cassette_dir,
+            offline=offline,
+            snapshot_dir=snapshot_dir,
+            update_snapshots=update_snapshots,
+            name_filter=k,
+            fail_fast=fail_fast,
         )
         reports.append(build_report(run_result))
         all_pass = all_pass and run_result.passed
@@ -118,7 +124,7 @@ def run(
 @app.command()
 def record(
     paths: list[str] = typer.Argument(..., help="suite YAML files or directories"),
-    provider: Optional[str] = typer.Option(None, "--provider"),
+    provider: str | None = typer.Option(None, "--provider"),
     cassette_dir: str = typer.Option("tests/cassettes", "--cassette-dir"),
     overwrite: bool = typer.Option(False, "--overwrite", help="re-record existing entries"),
 ) -> None:
@@ -127,8 +133,11 @@ def record(
     mode = "all" if overwrite else "new_episodes"
     for suite in suites:
         run_result = run_suite(
-            suite, provider=provider, record_mode=mode,
-            cassette_dir=cassette_dir, offline=False,
+            suite,
+            provider=provider,
+            record_mode=mode,
+            cassette_dir=cassette_dir,
+            offline=False,
         )
         typer.echo(f"recorded {suite.name}: {run_result.counts}")
 
@@ -151,8 +160,13 @@ def diff_cmd(
     d = diff_reports(base, curr)
     if format == "json":
         import json
-        typer.echo(json.dumps({"counts": d.counts(),
-                               "regressions": [x.case_name for x in d.regressions]}, indent=2))
+
+        typer.echo(
+            json.dumps(
+                {"counts": d.counts(), "regressions": [x.case_name for x in d.regressions]},
+                indent=2,
+            )
+        )
     else:
         render_diff_console(d)
 
@@ -175,7 +189,7 @@ def init(
     typer.echo("next: `promptdiff record prompts/` then `promptdiff run prompts/`")
 
 
-def _emit(payload: str, out: Optional[Path]) -> None:
+def _emit(payload: str, out: Path | None) -> None:
     if out:
         out.write_text(payload)
         typer.echo(f"wrote report to {out}")

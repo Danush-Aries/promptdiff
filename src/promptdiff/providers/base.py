@@ -1,4 +1,5 @@
 """Provider ABC and provider-related errors."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

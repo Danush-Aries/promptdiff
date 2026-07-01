@@ -1,4 +1,5 @@
 """ReplayProvider — serves recorded completions from a cassette, never the network."""
+
 from __future__ import annotations
 
 from typing import Any

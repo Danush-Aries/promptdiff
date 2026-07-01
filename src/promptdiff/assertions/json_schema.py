@@ -1,4 +1,5 @@
 """`json_schema` — parse output as JSON and validate against a JSON Schema."""
+
 from __future__ import annotations
 
 import json
@@ -16,8 +17,9 @@ if TYPE_CHECKING:
 class JsonSchemaAssertion(Assertion):
     type_name = "json_schema"
 
-    def __init__(self, schema: dict[str, Any], negate: bool = False,
-                 description: str | None = None) -> None:
+    def __init__(
+        self, schema: dict[str, Any], negate: bool = False, description: str | None = None
+    ) -> None:
         super().__init__(negate=negate, description=description)
         self.schema = schema
 
@@ -58,12 +60,14 @@ class JsonSchemaAssertion(Assertion):
                 detail={"payload": payload},
             )
         first = errors[0]
-        path = "$" + "".join(f"[{p!r}]" if isinstance(p, str) else f"[{p}]"
-                             for p in first.path)
+        path = "$" + "".join(f"[{p!r}]" if isinstance(p, str) else f"[{p}]" for p in first.path)
         return AssertionResult(
             type=self.type_name,
             passed=False,
             message=f"schema violation at {path}: {first.message}",
-            detail={"path": path, "error": first.message,
-                    "all_errors": [e.message for e in errors]},
+            detail={
+                "path": path,
+                "error": first.message,
+                "all_errors": [e.message for e in errors],
+            },
         )

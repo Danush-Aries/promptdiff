@@ -7,6 +7,7 @@ Aligns two reports by ``case_name`` and classifies each case:
   * ``removed``    — present only in baseline
   * ``unchanged``  — same pass/fail status
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -17,7 +18,7 @@ from .models import Report
 @dataclass(frozen=True)
 class CaseDelta:
     case_name: str
-    classification: str            # regression | fixed | new | removed | unchanged
+    classification: str  # regression | fixed | new | removed | unchanged
     baseline_passed: bool | None
     current_passed: bool | None
 
@@ -73,8 +74,9 @@ def diff_reports(baseline: Report, current: Report) -> DiffReport:
             klass = "fixed"
         else:
             klass = "unchanged"
-        deltas.append(CaseDelta(case_name=name, classification=klass,
-                                baseline_passed=b, current_passed=c))
+        deltas.append(
+            CaseDelta(case_name=name, classification=klass, baseline_passed=b, current_passed=c)
+        )
     return DiffReport(deltas=deltas)
 
 
@@ -86,9 +88,13 @@ def render_diff_console(diff: DiffReport, console=None) -> None:
     table = Table(title="promptdiff · regression diff")
     table.add_column("case", style="bold")
     table.add_column("change")
-    styles = {"regression": "[red]REGRESSION[/red]", "fixed": "[green]fixed[/green]",
-              "new": "[cyan]new[/cyan]", "removed": "[yellow]removed[/yellow]",
-              "unchanged": "unchanged"}
+    styles = {
+        "regression": "[red]REGRESSION[/red]",
+        "fixed": "[green]fixed[/green]",
+        "new": "[cyan]new[/cyan]",
+        "removed": "[yellow]removed[/yellow]",
+        "unchanged": "unchanged",
+    }
     for d in diff.deltas:
         if d.classification == "unchanged":
             continue

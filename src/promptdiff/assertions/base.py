@@ -4,6 +4,7 @@ Every assertion is a pure function of ``(output_text, ctx) -> AssertionResult``.
 The base class applies generic ``negate`` after ``evaluate`` so that, e.g.,
 ``not_contains`` is just ``contains`` with ``negate=True``.
 """
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -23,6 +24,7 @@ class AssertionConfigError(Exception):
 @dataclass
 class EvalContext:
     """Side-channel state an assertion may need (snapshot dirs, the owning case)."""
+
     case: Case | None = None
     snapshot_dir: str = "__snapshots__"
     baseline_dir: str = "baselines"

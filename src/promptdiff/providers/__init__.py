@@ -3,6 +3,7 @@
 Live providers (openai/anthropic) are constructed lazily by name; their SDKs are only
 imported inside ``generate`` so importing promptdiff pulls in zero optional deps.
 """
+
 from __future__ import annotations
 
 from .base import (
@@ -34,9 +35,7 @@ def list_providers() -> list[str]:
 def get_provider(name: str, model: str = "") -> Provider:
     """Instantiate a live provider by name. ``replay`` is handled by the runner directly."""
     if name not in _FACTORIES:
-        raise ProviderError(
-            f"unknown provider {name!r}; known: {', '.join(list_providers())}"
-        )
+        raise ProviderError(f"unknown provider {name!r}; known: {', '.join(list_providers())}")
     cls = _FACTORIES[name]
     return cls(model=model) if model else cls()
 

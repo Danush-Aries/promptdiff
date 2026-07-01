@@ -1,4 +1,5 @@
 """`regex` — pattern match assertion (search or full_match)."""
+
 from __future__ import annotations
 
 import re
@@ -16,8 +17,14 @@ _FLAG_MAP = {"i": re.IGNORECASE, "m": re.MULTILINE, "s": re.DOTALL, "x": re.VERB
 class RegexAssertion(Assertion):
     type_name = "regex"
 
-    def __init__(self, pattern: str, flags: str = "", full_match: bool = False,
-                 negate: bool = False, description: str | None = None) -> None:
+    def __init__(
+        self,
+        pattern: str,
+        flags: str = "",
+        full_match: bool = False,
+        negate: bool = False,
+        description: str | None = None,
+    ) -> None:
         super().__init__(negate=negate, description=description)
         flagbits = 0
         for ch in flags:
@@ -49,12 +56,14 @@ class RegexAssertion(Assertion):
         m = self.regex.fullmatch(output) if self.full_match else self.regex.search(output)
         kind = "fullmatch" if self.full_match else "search"
         passed = m is not None
-        msg = (f"pattern {self.pattern!r} {kind} "
-               + ("matched" if passed else "did not match"))
+        msg = f"pattern {self.pattern!r} {kind} " + ("matched" if passed else "did not match")
         return AssertionResult(
             type=self.type_name,
             passed=passed,
             message=msg,
-            detail={"pattern": self.pattern, "kind": kind,
-                    "matched_span": list(m.span()) if m else None},
+            detail={
+                "pattern": self.pattern,
+                "kind": kind,
+                "matched_span": list(m.span()) if m else None,
+            },
         )

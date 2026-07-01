@@ -5,6 +5,7 @@ against these types. Kept dependency-free (stdlib only) so it stays the stable c
 of the package. Inputs are frozen; only accumulator types (RunResult, Cassette) are
 mutable while a run is in flight.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -19,8 +20,17 @@ CASSETTE_VERSION = 1
 # timeouts, streaming flags, api keys, etc.) is stripped before hashing so that
 # record/replay stays stable across environments.
 CANONICAL_PARAM_ALLOWLIST = frozenset(
-    {"temperature", "max_tokens", "top_p", "seed", "stop", "presence_penalty",
-     "frequency_penalty", "n", "system"}
+    {
+        "temperature",
+        "max_tokens",
+        "top_p",
+        "seed",
+        "stop",
+        "presence_penalty",
+        "frequency_penalty",
+        "n",
+        "system",
+    }
 )
 
 
@@ -29,20 +39,20 @@ CANONICAL_PARAM_ALLOWLIST = frozenset(
 
 @dataclass(frozen=True)
 class AssertionSpec:
-    type: str                                  # "contains" | "regex" | "json_schema" | ...
+    type: str  # "contains" | "regex" | "json_schema" | ...
     config: dict[str, Any] = field(default_factory=dict)
-    negate: bool = False                       # generic negation (powers not_contains)
+    negate: bool = False  # generic negation (powers not_contains)
     weight: float = 1.0
     description: str | None = None
 
 
 @dataclass(frozen=True)
 class Case:
-    name: str                                  # unique within a suite; test id + cassette key part
-    provider: str                              # "openai" | "anthropic" | "replay"
+    name: str  # unique within a suite; test id + cassette key part
+    provider: str  # "openai" | "anthropic" | "replay"
     model: str
-    prompt: str | None = None                  # literal prompt OR ...
-    template: str | None = None                # ... a template string with {var} placeholders
+    prompt: str | None = None  # literal prompt OR ...
+    template: str | None = None  # ... a template string with {var} placeholders
     vars: dict[str, Any] = field(default_factory=dict)
     params: dict[str, Any] = field(default_factory=dict)
     assertions: list[AssertionSpec] = field(default_factory=list)
@@ -144,13 +154,18 @@ class RunResult:
         passed = sum(1 for c in self.case_results if c.passed)
         errors = sum(1 for c in self.case_results if c.error)
         failed = sum(1 for c in self.case_results if not c.passed and not c.error)
-        return {"passed": passed, "failed": failed, "errors": errors,
-                "total": len(self.case_results)}
+        return {
+            "passed": passed,
+            "failed": failed,
+            "errors": errors,
+            "total": len(self.case_results),
+        }
 
 
 @dataclass(frozen=True)
 class Report:
     """Serializable summary of a RunResult, with a schema version for forward-compat."""
+
     run: RunResult
     schema_version: int = REPORT_SCHEMA_VERSION
     promptdiff_version: str = ""
@@ -282,9 +297,7 @@ class Cassette:
             return cls(path=path)
         with open(path, encoding="utf-8") as fh:
             data = json.load(fh)
-        entries = {
-            k: CassetteEntry.from_dict(v) for k, v in data.get("entries", {}).items()
-        }
+        entries = {k: CassetteEntry.from_dict(v) for k, v in data.get("entries", {}).items()}
         return cls(path=path, version=data.get("version", CASSETTE_VERSION), entries=entries)
 
     def to_dict(self) -> dict[str, Any]:

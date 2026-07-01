@@ -1,4 +1,5 @@
 """Anthropic provider — lazy SDK import so the package installs with zero heavy deps."""
+
 from __future__ import annotations
 
 import os
@@ -37,8 +38,14 @@ class AnthropicProvider(Provider):
         )
         latency = (time.perf_counter() - t0) * 1000
         text = "".join(block.text for block in resp.content if getattr(block, "type", "") == "text")
-        usage = {"prompt_tokens": resp.usage.input_tokens,
-                 "completion_tokens": resp.usage.output_tokens} if resp.usage else {}
+        usage = (
+            {
+                "prompt_tokens": resp.usage.input_tokens,
+                "completion_tokens": resp.usage.output_tokens,
+            }
+            if resp.usage
+            else {}
+        )
         return Completion(
             text=text,
             model=model,

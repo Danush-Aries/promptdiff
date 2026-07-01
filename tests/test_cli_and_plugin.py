@@ -34,9 +34,11 @@ def test_cli_run_all_pass_exit_0():
 
 
 def test_cli_run_failure_exit_1(tmp_path):
-    suite = tmp_path / "fail.promptdiff.yaml"
+    # Suite name must match the committed cassette (greetings.json) so the prompt replays,
+    # then the wrong-answer assertion fails -> exit 1 (a real assertion failure, not a miss).
+    suite = tmp_path / "greetings.promptdiff.yaml"
     suite.write_text(
-        "name: fail\n"
+        "name: greetings\n"
         "defaults: { provider: openai, model: gpt-4o-mini, params: { temperature: 0 } }\n"
         "cases:\n"
         "  - name: capital_of_france\n"
@@ -94,36 +96,28 @@ pytest_plugins = ["pytester"]
 
 
 def test_pytest_plugin_collects_yaml_cases(pytester):
-    pytester.makefile(
-        ".json",
-        **{"tests/cassettes/mini": (
-            '{"version": 1, "entries": {}}'
-        )},
-    )
-    # a suite whose single case will pass against an inline cassette entry
-    from promptdiff.models import Cassette, Completion, cassette_key  # noqa: F401
+    # The promptdiff plugin auto-registers via its entry point; build a suite + cassette
+    # in the sandbox and confirm pytest collects one item per case and runs it offline.
+    from promptdiff.models import Cassette, Completion
     from promptdiff.providers.cassette import make_entry
 
     cas = Cassette(path=str(pytester.path / "cassettes" / "mini.json"))
     cas.put(make_entry("openai", "m", "say hi", {},
                        Completion("hi there", "m", "openai")))
-    os.makedirs(os.path.dirname(cas.path), exist_ok=True)
     cas.save()
 
-    pytester.makefile(
-        ".yaml",
-        **{"mini.promptdiff": (
-            "name: mini\n"
-            "defaults: { provider: openai, model: m }\n"
-            "cases:\n"
-            "  - name: greet\n"
-            "    prompt: \"say hi\"\n"
-            "    assertions:\n"
-            "      - type: contains\n"
-            "        value: hi\n"
-        )},
+    # NB: write directly — pytester.makefile() uses with_suffix() and would strip
+    # the ".promptdiff" segment, producing "mini.yaml" which the plugin ignores.
+    (pytester.path / "mini.promptdiff.yaml").write_text(
+        "name: mini\n"
+        "defaults: { provider: openai, model: m }\n"
+        "cases:\n"
+        "  - name: greet\n"
+        "    prompt: \"say hi\"\n"
+        "    assertions:\n"
+        "      - type: contains\n"
+        "        value: hi\n"
     )
-    result = pytester.runpytest("-p", "promptdiff.pytest_plugin",
-                                "-o", "promptdiff_cassette_dir=cassettes", "-v")
+    result = pytester.runpytest_subprocess("-o", "promptdiff_cassette_dir=cassettes", "-v")
     result.assert_outcomes(passed=1)
     assert "greet" in result.stdout.str()

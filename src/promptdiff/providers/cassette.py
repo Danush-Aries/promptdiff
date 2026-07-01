@@ -4,6 +4,7 @@ Provides :class:`RecordingProvider`, a VCR-style wrapper that calls a real provi
 stores the response into a :class:`Cassette`, and thereafter behaves like replay. The
 record modes mirror VCR: ``none`` | ``once`` | ``new_episodes`` | ``all``.
 """
+
 from __future__ import annotations
 
 import datetime as _dt
@@ -15,8 +16,9 @@ from .base import CassetteMiss, Provider
 RECORD_MODES = ("none", "once", "new_episodes", "all")
 
 # Keys redacted from a stored ``raw`` blob so secrets never land in a committed cassette.
-_REDACT_KEYS = frozenset({"api_key", "authorization", "auth", "token", "openai_api_key",
-                          "anthropic_api_key"})
+_REDACT_KEYS = frozenset(
+    {"api_key", "authorization", "auth", "token", "openai_api_key", "anthropic_api_key"}
+)
 
 
 def _now() -> str:
@@ -48,8 +50,9 @@ class RecordingProvider(Provider):
 
     name = "recording"
 
-    def __init__(self, inner: Provider, cassette: Cassette, mode: str = "once",
-                 store_raw: bool = True) -> None:
+    def __init__(
+        self, inner: Provider, cassette: Cassette, mode: str = "once", store_raw: bool = True
+    ) -> None:
         if mode not in RECORD_MODES:
             raise ValueError(f"record mode must be one of {RECORD_MODES}, got {mode!r}")
         self.inner = inner
@@ -72,13 +75,22 @@ class RecordingProvider(Provider):
         completion = self.inner.generate(prompt, params)
         stored = completion
         if not self.store_raw:
-            stored = Completion(text=completion.text, model=completion.model,
-                                provider=completion.provider, usage=completion.usage,
-                                latency_ms=completion.latency_ms)
+            stored = Completion(
+                text=completion.text,
+                model=completion.model,
+                provider=completion.provider,
+                usage=completion.usage,
+                latency_ms=completion.latency_ms,
+            )
         elif completion.raw:
-            stored = Completion(text=completion.text, model=completion.model,
-                                provider=completion.provider, raw=redact(completion.raw),
-                                usage=completion.usage, latency_ms=completion.latency_ms)
+            stored = Completion(
+                text=completion.text,
+                model=completion.model,
+                provider=completion.provider,
+                raw=redact(completion.raw),
+                usage=completion.usage,
+                latency_ms=completion.latency_ms,
+            )
         canonical = {k: v for k, v in params.items() if not k.startswith("_")}
         entry = CassetteEntry(
             key=key,
@@ -92,8 +104,9 @@ class RecordingProvider(Provider):
         return stored
 
 
-def make_entry(provider: str, model: str, prompt: str, params: dict[str, Any],
-               completion: Completion) -> CassetteEntry:
+def make_entry(
+    provider: str, model: str, prompt: str, params: dict[str, Any], completion: Completion
+) -> CassetteEntry:
     """Build a :class:`CassetteEntry` (used by tests and manual recording)."""
     canonical = {k: v for k, v in params.items() if not k.startswith("_")}
     return CassetteEntry(

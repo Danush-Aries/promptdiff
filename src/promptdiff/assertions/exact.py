@@ -1,4 +1,5 @@
 """`exact` — string equality assertion (with optional strip)."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -13,8 +14,9 @@ if TYPE_CHECKING:
 class ExactAssertion(Assertion):
     type_name = "exact"
 
-    def __init__(self, value: str, strip: bool = True,
-                 negate: bool = False, description: str | None = None) -> None:
+    def __init__(
+        self, value: str, strip: bool = True, negate: bool = False, description: str | None = None
+    ) -> None:
         super().__init__(negate=negate, description=description)
         self.value = value
         self.strip = strip

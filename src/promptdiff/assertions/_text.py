@@ -1,4 +1,5 @@
 """Shared text helpers for assertions: JSON extraction and token normalization."""
+
 from __future__ import annotations
 
 import json
@@ -41,7 +42,7 @@ def extract_json(text: str) -> Any:
             elif ch == closer:
                 depth -= 1
                 if depth == 0:
-                    candidate = text[start:i + 1]
+                    candidate = text[start : i + 1]
                     try:
                         return json.loads(candidate)
                     except (ValueError, TypeError):

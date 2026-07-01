@@ -4,20 +4,20 @@ Provider/render errors are captured as failing :class:`CaseResult`s (never crash
 whole run). Ordering is deterministic. Offline replay is the default so the same code
 path is exercised in CI with zero network.
 """
+
 from __future__ import annotations
 
 import datetime as _dt
 import os
 import time
-from typing import Any
 
 from . import __version__, assertions
 from .assertions import AssertionConfigError, EvalContext
 from .models import (
     AssertionResult,
     Case,
-    Cassette,
     CaseResult,
+    Cassette,
     Completion,
     Report,
     RunResult,
@@ -65,9 +65,14 @@ def _run_assertions(case: Case, text: str, ctx: EvalContext) -> list[AssertionRe
         try:
             assertion = assertions.build(spec)
         except AssertionConfigError as e:
-            results.append(AssertionResult(type=spec.type, passed=False,
-                                           message=f"config error: {e}",
-                                           detail={"error": "config"}))
+            results.append(
+                AssertionResult(
+                    type=spec.type,
+                    passed=False,
+                    message=f"config error: {e}",
+                    detail={"error": "config"},
+                )
+            )
             continue
         results.append(assertion.run(text, ctx))
     return results
@@ -86,7 +91,8 @@ def run_case(
         prompt = case.rendered_prompt
     except (KeyError, ValueError) as e:
         return CaseResult(
-            case_name=case.name, passed=False,
+            case_name=case.name,
+            passed=False,
             completion=Completion(text="", model=case.model, provider=effective_provider),
             error=f"prompt render error: {e}",
             duration_ms=(time.perf_counter() - t0) * 1000,
@@ -99,7 +105,8 @@ def run_case(
         completion = provider.generate(prompt, params)
     except Exception as e:  # provider errors are failing results, not crashes
         return CaseResult(
-            case_name=case.name, passed=False,
+            case_name=case.name,
+            passed=False,
             completion=Completion(text="", model=case.model, provider=effective_provider),
             error=f"{type(e).__name__}: {e}",
             duration_ms=(time.perf_counter() - t0) * 1000,
@@ -109,8 +116,11 @@ def run_case(
     results = _run_assertions(case, completion.text, ctx)
     passed = all(r.passed for r in results)
     return CaseResult(
-        case_name=case.name, passed=passed, completion=completion,
-        assertion_results=results, error=None,
+        case_name=case.name,
+        passed=passed,
+        completion=completion,
+        assertion_results=results,
+        error=None,
         duration_ms=(time.perf_counter() - t0) * 1000,
     )
 
@@ -136,15 +146,16 @@ def run_suite(
     cases = suite.cases
     if name_filter:
         needle = name_filter.lower()
-        cases = [c for c in cases
-                 if needle in c.name.lower() or any(needle in t.lower() for t in c.tags)]
+        cases = [
+            c for c in cases if needle in c.name.lower() or any(needle in t.lower() for t in c.tags)
+        ]
 
     model = suite.defaults.get("model", cases[0].model if cases else "")
-    run = RunResult(suite_name=suite.name, provider=eff_name, model=model,
-                    started_at=_now_iso())
+    run = RunResult(suite_name=suite.name, provider=eff_name, model=model, started_at=_now_iso())
     for case in cases:
-        result = run_case(case, prov, eff_name, snapshot_dir=snapshot_dir,
-                          update_snapshots=update_snapshots)
+        result = run_case(
+            case, prov, eff_name, snapshot_dir=snapshot_dir, update_snapshots=update_snapshots
+        )
         run.case_results.append(result)
         if fail_fast and not result.passed:
             break

@@ -1,4 +1,5 @@
 """OpenAI provider — lazy SDK import so the package installs with zero heavy deps."""
+
 from __future__ import annotations
 
 import os
@@ -8,8 +9,16 @@ from typing import Any
 from ..models import Completion
 from .base import MissingAPIKey, MissingProviderDep, Provider
 
-_CHAT_PARAMS = {"temperature", "max_tokens", "top_p", "seed", "stop",
-                "presence_penalty", "frequency_penalty", "n"}
+_CHAT_PARAMS = {
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "seed",
+    "stop",
+    "presence_penalty",
+    "frequency_penalty",
+    "n",
+}
 
 
 class OpenAIProvider(Provider):
@@ -40,8 +49,10 @@ class OpenAIProvider(Provider):
         latency = (time.perf_counter() - t0) * 1000
         usage = {}
         if resp.usage:
-            usage = {"prompt_tokens": resp.usage.prompt_tokens,
-                     "completion_tokens": resp.usage.completion_tokens}
+            usage = {
+                "prompt_tokens": resp.usage.prompt_tokens,
+                "completion_tokens": resp.usage.completion_tokens,
+            }
         return Completion(
             text=resp.choices[0].message.content or "",
             model=model,

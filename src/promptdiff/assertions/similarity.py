@@ -5,9 +5,11 @@ embedding backend is used. Otherwise (and by default, and always in CI) a pure-P
 Jaccard token-overlap score keeps the assertion fully offline and dependency-free.
 The backend is a swappable seam (``_backend``) so the embedding path is mockable.
 """
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 from ..models import AssertionResult
 from ._text import normalize_tokens
@@ -40,9 +42,15 @@ def _embedding_backend(a: str, b: str) -> float:  # pragma: no cover - optional 
 class SimilarityAssertion(Assertion):
     type_name = "semantic_similarity"
 
-    def __init__(self, reference: str, threshold: float = 0.8, metric: str = "token_overlap",
-                 backend: Callable[[str, str], float] | None = None,
-                 negate: bool = False, description: str | None = None) -> None:
+    def __init__(
+        self,
+        reference: str,
+        threshold: float = 0.8,
+        metric: str = "token_overlap",
+        backend: Callable[[str, str], float] | None = None,
+        negate: bool = False,
+        description: str | None = None,
+    ) -> None:
         super().__init__(negate=negate, description=description)
         if not 0.0 <= threshold <= 1.0:
             raise AssertionConfigError("semantic_similarity: threshold must be in [0, 1]")
@@ -56,6 +64,7 @@ class SimilarityAssertion(Assertion):
         if metric == "cosine":
             try:
                 import sentence_transformers  # noqa: F401
+
                 return _embedding_backend
             except ImportError:
                 return token_overlap

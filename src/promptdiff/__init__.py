@@ -5,6 +5,7 @@ regresses outputs. Snapshot/baseline diffing is the core primitive, cases run wi
 native pytest ergonomics, and every run is hermetic: offline-by-default VCR-style
 cassettes make CI real-but-free with zero API spend.
 """
+
 from __future__ import annotations
 
 __version__ = "0.1.0"
@@ -13,9 +14,9 @@ from .models import (
     AssertionResult,
     AssertionSpec,
     Case,
+    CaseResult,
     Cassette,
     CassetteEntry,
-    CaseResult,
     Completion,
     Report,
     RunResult,

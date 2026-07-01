@@ -16,6 +16,7 @@ A suite file looks like::
 
 Per-case fields override ``defaults``. ``params`` are shallow-merged (case wins).
 """
+
 from __future__ import annotations
 
 import glob
@@ -43,8 +44,9 @@ def _parse_assertions(raw: Any, case_name: str) -> list[AssertionSpec]:
         atype = item.get("type")
         if not atype:
             raise LoaderError(f"case '{case_name}': assertion #{i} missing 'type'")
-        config = {k: v for k, v in item.items()
-                  if k not in {"type", "negate", "weight", "description"}}
+        config = {
+            k: v for k, v in item.items() if k not in {"type", "negate", "weight", "description"}
+        }
         specs.append(
             AssertionSpec(
                 type=str(atype),
