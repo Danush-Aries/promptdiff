@@ -1,0 +1,27 @@
+# virtualenvs
+.venv/
+venv/
+env/
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+
+# caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# os / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

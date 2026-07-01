@@ -1,0 +1,45 @@
+{
+  "entries": {
+    "3e180b0205e71f45b0230f0a74da39f896618d512fe3de3c59dcdbaa2d7e9977": {
+      "key": "3e180b0205e71f45b0230f0a74da39f896618d512fe3de3c59dcdbaa2d7e9977",
+      "model": "gpt-4o-mini",
+      "provider": "openai",
+      "recorded_at": "2026-07-01T22:23:16.116304+00:00",
+      "request": {
+        "params": {
+          "temperature": 0
+        },
+        "prompt": "What is the capital of France? Answer in one word."
+      },
+      "response": {
+        "latency_ms": null,
+        "model": "gpt-4o-mini",
+        "provider": "openai",
+        "raw": {},
+        "text": "Paris",
+        "usage": {}
+      }
+    },
+    "e92c105357f10d3dda1f38a6b371ee7338058a6739c3334601aab7c4966ebc52": {
+      "key": "e92c105357f10d3dda1f38a6b371ee7338058a6739c3334601aab7c4966ebc52",
+      "model": "gpt-4o-mini",
+      "provider": "openai",
+      "recorded_at": "2026-07-01T22:23:16.117440+00:00",
+      "request": {
+        "params": {
+          "temperature": 0
+        },
+        "prompt": "Return a JSON object with name and age."
+      },
+      "response": {
+        "latency_ms": null,
+        "model": "gpt-4o-mini",
+        "provider": "openai",
+        "raw": {},
+        "text": "{\"name\": \"Ada\", \"age\": 36}",
+        "usage": {}
+      }
+    }
+  },
+  "version": 1
+}

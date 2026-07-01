@@ -1,0 +1,25 @@
+name: greetings
+defaults:
+  provider: openai
+  model: gpt-4o-mini
+  params:
+    temperature: 0
+cases:
+  - name: capital_of_france
+    prompt: "What is the capital of France? Answer in one word."
+    tags: [geo, smoke]
+    assertions:
+      - type: contains
+        value: Paris
+        case_sensitive: false
+  - name: structured_user
+    prompt: "Return a JSON object with name and age."
+    tags: [json]
+    assertions:
+      - type: json_schema
+        schema:
+          type: object
+          required: [name, age]
+          properties:
+            name: { type: string }
+            age: { type: integer, minimum: 0 }
