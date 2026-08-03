@@ -183,3 +183,12 @@ The whole suite runs offline with no API key. PRs welcome.
 ## License
 
 MIT © 2026 Dhanush Shankar
+
+
+---
+
+<p align="center">
+  <b>⭐ If this project helps you, star it</b> — stars are how open-source tools get found, and every one directly supports more development.
+  <br/><sub>· Found a bug? Open an <a href="https://github.com/Danush-Aries/promptdiff/issues">issue</a> · Want to chat? <a href="https://github.com/Danush-Aries/promptdiff/discussions">Discussions</a> · Contribute? See <a href="https://github.com/Danush-Aries/promptdiff/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> ·</sub>
+</p>
+
